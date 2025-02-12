@@ -1,0 +1,174 @@
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #181818;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2b2b2b;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #4CAF50;
+            text-align: center;
+        }
+
+        .sidebar button {
+            color: #fff;
+            font-size: 16px;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        #start-button {
+            background-color: #4CAF50;
+            /* Green */
+        }
+
+        #stop-button {
+            background-color: #dc3545;
+            /* Red */
+        }
+
+        .sidebar button:disabled {
+            background-color: #6c757d;
+        }
+
+        .sidebar button:hover {
+            transform: translateY(-2px);
+        }
+
+        #set-class-button {
+            background-color: #007bff;
+            /* Blue */
+            color: #fff;
+            font-size: 16px;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        #set-class-button:hover {
+            background-color: #0056b3;
+            /* Darker blue on hover */
+        }
+
+        .sidebar select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+            background-color: #333;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar select:hover {
+            background-color: #444;
+        }
+
+        .sidebar #detected-classes {
+            font-size: 18px;
+            color: #aaa;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Video container */
+        .video-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #141414;
+            position: relative;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .video-container img {
+            border: 3px solid #333;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .video-container img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Status Icon */
+        #status {
+            font-size: 12px;
+            padding: 10px 16px;
+            border-radius: 50%;
+            text-align: center;
+            width: 12px;
+            height: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .status-connected {
+            background-color: #28a745;
+        }
+
+        .status-disconnected {
+            background-color: #dc3545;
+        }
+
+        /* Smooth transition for body and video frame */
+        body,
+        .video-container {
+            transition: background-color 0.3s ease;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 220px;
+                padding: 15px;
+            }
+
+            .video-container img {
+                width: 100%;
+                height: auto;
+            }
+        }
