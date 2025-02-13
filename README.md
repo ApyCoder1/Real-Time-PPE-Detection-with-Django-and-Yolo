@@ -63,7 +63,7 @@ pip install -r requirements.txt
 - Implement cloud-based storage for detection logs.
 
 ## Author
-Asif Khan
+ApyCoder
 
 ## License
 This project is licensed under the MIT License.
