@@ -179,7 +179,3 @@ class VideoStreamConsumer(AsyncWebsocketConsumer):
 
         print("Video stream ended")
 
-
-
-
-###############################################
