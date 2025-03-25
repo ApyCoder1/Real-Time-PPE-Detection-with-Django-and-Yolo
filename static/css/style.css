@@ -172,3 +172,27 @@
                 height: auto;
             }
         }
+/* veiw log link  */
+.logs-link {
+    display: block;
+    margin-top: 20px;
+    padding: 10px 15px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(135deg, #007bff, #00d4ff);
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.logs-link:hover {
+    background: linear-gradient(135deg, #0056b3, #0088cc);
+    transform: scale(1.05);
+    text-decoration: none;
+}
+
+.logs-link:active {
+    transform: scale(0.95);
+}
