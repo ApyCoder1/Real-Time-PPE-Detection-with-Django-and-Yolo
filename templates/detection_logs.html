@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time PPE Logs</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #ddd;
+            margin-bottom: 30px;
+        }
+
+        /* Card Container */
+        .card-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Modern Glassmorphism Card */
+        .card {
+            width: 300px;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            color: #00eaff;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Pie Chart Container */
+        .pie-chart-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 90%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        th {
+            background: rgba(0, 234, 255, 0.3);
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(0, 234, 255, 0.2);
+        }
+
+        .loading {
+            font-size: 18px;
+            color: #00eaff;
+            margin-top: 20px;
+        }
+
+        canvas {
+            max-width: 350px;
+            max-height: 350px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-Time PPE Logs</h1>
+    <p>Data updates automatically every 2 seconds.</p>
+
+    <!-- Modern Glassmorphism Cards -->
+    <div class="card-container">
+        <div class="card">
+            <h3>Total Detections</h3>
+            <p id="total-detections">0</p>
+        </div>
+        <div class="card">
+            <h3>Total Class IDs</h3>
+            <p id="total-class-ids">0</p>
+        </div>
+        <div class="card">
+            <h3>Total Class Names</h3>
+            <p id="total-class-names">0</p>
+        </div>
+    </div>
+
+    <!-- Pie Chart Section -->
+    <h3>Detection Analysis</h3>
+    <div class="pie-chart-container">
+        <canvas id="pie-chart"></canvas>
+        <canvas id="time-pie-chart"></canvas>
+    </div>
+
+    <div class="loading">Loading data...</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Class ID</th>
+                <th>Class Name</th>
+                <th>Confidence</th>
+                <th>Track ID</th>
+                <th>Bounding Box</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="detection-table-body"></tbody>
+    </table>
+
+    <script>
+        function fetchDetections() {
+            $.ajax({
+                url: '{% url "fetch_detections" %}',  
+                method: 'GET',
+                success: function(response) {
+                    var detections = response.detections;
+                    var tableBody = $('#detection-table-body');
+                    var mostFrequentClasses = response.most_frequent_classes;
+                    var timeBasedCounts = response.time_based_counts;
+                    tableBody.empty(); 
+
+                    if (detections.length === 0) {
+                        $('.loading').text('No detections found.');
+                    } else {
+                        $('.loading').hide();
+                    }
+
+                    detections.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                    var totalClassIds = new Set();
+                    var totalClassNames = new Set();
+
+                    detections.forEach(function(detection) {
+                        var row = `<tr>
+                            <td>${detection.id}</td>
+                            <td>${detection.class_id}</td>
+                            <td>${detection.class_name}</td>
+                            <td>${(detection.confidence * 100).toFixed(2)}%</td>
+                            <td>${detection.track_id}</td>
+                            <td>${detection.bbox}</td>
+                            <td>${new Date(detection.timestamp).toLocaleString()}</td>
+                        </tr>`;
+                        tableBody.append(row);
+
+                        totalClassIds.add(detection.class_id);
+                        totalClassNames.add(detection.class_name);
+                    });
+
+                    $('#total-detections').text(detections.length);
+                    $('#total-class-ids').text(totalClassIds.size);
+                    $('#total-class-names').text(totalClassNames.size);
+
+                    var chartLabels = [], chartData = [];
+                    mostFrequentClasses.forEach(function(classItem) {
+                        chartLabels.push(classItem[0]);
+                        chartData.push(classItem[1]);
+                    });
+
+                    new Chart(document.getElementById('pie-chart').getContext('2d'), {
+                        type: 'pie',
+                        data: { labels: chartLabels, datasets: [{ data: chartData, backgroundColor: ['#FF5733', '#33FF57', '#3357FF'] }] },
+                        options: { responsive: true, plugins: { legend: { position: 'top' } } }
+                    });
+
+                    var timeLabels = [], timeData = [];
+                    for (var timeRange in timeBasedCounts) {
+                        timeLabels.push(timeRange);
+                        timeData.push(timeBasedCounts[timeRange]);
+                    }
+
+                    new Chart(document.getElementById('time-pie-chart').getContext('2d'), {
+                        type: 'pie',
+                        data: { labels: timeLabels, datasets: [{ data: timeData, backgroundColor: ['#FF5733', '#33FF57', '#3357FF'] }] },
+                        options: { responsive: true, plugins: { legend: { position: 'top' } } }
+                    });
+                }
+            });
+        }
+
+        setInterval(fetchDetections, 2000);
+        $(document).ready(fetchDetections);
+    </script>
+</body>
+</html>
